@@ -4,7 +4,7 @@ import Image from 'next/image'
 export default function Home() {
   return (
     <div>
-      <Image src="/home.jpg" alt='home' className='-z-10' layout="responsive" width={1920} height={720} ></Image>
+      <Image priority={true} src="/home.jpg" alt='home' className='-z-10' layout="responsive" width={1920} height={720} ></Image>
       <section className="text-gray-600 body-font">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-wrap w-full mb-20 flex-col items-center text-center">
