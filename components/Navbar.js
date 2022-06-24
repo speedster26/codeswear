@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react'
+import { useRouter } from 'next/router';
 import Image from 'next/image'
 import Link from 'next/link'
 import { AiOutlineShoppingCart, AiFillCloseCircle, AiFillPlusCircle, AiFillMinusCircle, AiFillCaretUp } from 'react-icons/ai';
@@ -7,16 +8,27 @@ import { BsBagCheckFill, BsFillBagXFill, BsPersonCircle } from 'react-icons/bs';
 const Navbar = (props) => {
   const { logout, user, cart, addToCart, removeFromCart, clearCart, subTotal, buyNowCart, setBuyNowCart, clearBuyNowCart } = props
   const refC = useRef()
+  const refB = useRef()
+  const router = useRouter()
   const [reRender, setReRender] = useState(false)
   const [dropdown, setDropdown] = useState(false)
-  useEffect(() => {
-    if (buyNowCart) {
-      setReRender(true)
-    }
-    else {
-      setReRender(false)
-    }
-  }, [buyNowCart])
+  const [key, setKey] = useState(Math.random())
+  // useEffect(() => {
+  //   // if (buyNowCart) {
+  //   //   setReRender(true)
+  //   // }
+  //   // else {
+  //   //   setReRender(false)
+  //   // }
+  //   // console.log(cart);
+  //   // if(cart.length!==0){
+  //   //   refB.current.classList.remove('invisible')
+  //   // }
+  //   // else{
+  //   //   refB.current.classList.add('invisible')
+  //   // }
+
+  // }, [buyNowCart])
 
   const toggleCart = () => {
     if (refC.current.classList.contains("hidden")) {
@@ -38,6 +50,11 @@ const Navbar = (props) => {
   const refM = useRef()
   const toggleNav = () => {
     refM.current.classList.toggle("hidden")
+  }
+  const refreshCheckout = ()=>{
+    setKey(Math.random())
+    setBuyNowCart([])
+    // router.push('/checkout')
   }
   return (
     <div className='sticky top-0 z-10 '>
@@ -66,12 +83,16 @@ const Navbar = (props) => {
                   <div className='text-pink-500 -mb-1 -mr-[0.125rem]'><AiFillCaretUp/></div>
                   <ul className='bg-pink-500 w-32 h-32 flex justify-center flex-col items-center rounded-lg rounded-tr-none'>
                     <li className='hover:bg-pink-200 hover:text-pink-500 flex justify-center w-full'><Link href={'/myaccount'}><a>My Account</a></Link></li>
-                    <li className='hover:bg-pink-200 hover:text-pink-500 flex justify-center w-full'><Link href={'/orders'}><a>My Orders</a></Link></li>
+                    <li className='hover:bg-pink-200 hover:text-pink-500 flex justify-center w-full'><Link href={`/orders?id=${user.value}`} as={`/orders`}><a>My Orders</a></Link></li>
                     <li className='hover:bg-pink-200 hover:text-pink-500 flex justify-center w-full cursor-pointer' onClick={logout}><a>Logout</a></li>
                   </ul>
                 </div>}
               </div>}
+              <span className='relative inline-block'>
+
               <span onClick={toggleCart} className='hover:text-pink-500 cursor-pointer'><AiOutlineShoppingCart /></span>
+              <span className="absolute top-0 right-0 inline-flex items-center justify-center p-1 text-xs font-bold leading-none stransform translate-x-1/2 -translate-y-1/2  rounded-full bg-pink-500 text-black">{Object.keys(cart).length}</span>
+              </span>
             </div>
             <div className="md:hidden flex items-center">
               <button onClick={toggleNav} className="outline-none mobile-menu-button">
@@ -98,10 +119,12 @@ const Navbar = (props) => {
             <Link href={"/hoodies"}><a className="block text-pink-100 font-medium text-center px-2 py-4 hover:bg-pink-500 transition duration-300"><li>Hoodies</li></a></Link>
             <Link href={"/mugs"}><a className="block text-pink-100 font-medium text-center px-2 py-4 hover:bg-pink-500 transition duration-300"><li>Mugs</li></a></Link>
           </ul>
-          <div className="flex flex-col mx-auto items-center justify-center border-t-[1px] border-pink-300">
-            {user.value && <button className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">Login</button>}
-            {user.value && <button className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">Signup</button>}
-            {!user.value && <button className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">Logout</button>}
+          <div className="flex flex-row mx-auto items-center justify-center border-t-[1px] border-pink-300">
+            {!user.value && <Link href={'/login'}><a className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">Login</a></Link>}
+            {!user.value && <Link href={'/signup'}><a className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">Signup</a></Link>}
+            {user.value && <button onClick={()=>{router.push('/myaccount',`/myaccount/123456789`)}} className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">My Account</button>}
+            {user.value && <button onClick={()=>{router.push(`/orders?id=${user.value}`,`/orders`)}} className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">My Orders</button>}
+            {user.value && <button onClick={logout} className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">Logout</button>}
           </div>
         </div>
 
@@ -129,12 +152,12 @@ const Navbar = (props) => {
 
         </ol>
         <div className='flex flex-col text-xl space-y-3 font-medium'>
-          <h3>Total: ₹{subTotal}</h3>
+          <h3 className={`${cart.length===0? "invisible" : ""}`}>Total: ₹{subTotal}</h3>
           <div className="flex space-x-2">
 
-            {Object.keys(buyNowCart).length === 0 && <Link id='cartCheck' href={'/checkout'}><button className="flex mr-5 text-white bg-[#f47ed8] border-0 py-2 px-8 focus:outline-none hover:bg-pink-500 rounded text-lg"><BsBagCheckFill className='m-1' />Checkout</button></Link>}
-            {Object.keys(buyNowCart).length !== 0 && <button id='cartCheck' className="flex mr-5 text-white bg-[#f47ed8] border-0 py-2 px-8 focus:outline-none hover:bg-pink-500 rounded text-lg"><BsBagCheckFill className='m-1' onClick={() => refreshCheckout()} />Checkout</button>}
-            <button onClick={clearCart} className="flex mr-5  text-white bg-[#f47ed8] border-0 py-2 px-8 focus:outline-none hover:bg-pink-500 rounded text-lg"><BsFillBagXFill className='m-1' />Clear</button>
+            {Object.keys(buyNowCart).length === 0 && <button  id='cartCheck' onClick={()=>{router.push('/checkout')}} className={`flex mr-5 text-white bg-[#f47ed8] border-0 py-2 px-8 focus:outline-none hover:bg-pink-500 rounded text-lg  ${cart.length===0? "invisible" : ""}`}><BsBagCheckFill className='m-1' />Checkout</button>}
+            {Object.keys(buyNowCart).length !== 0 && <button onClick={() => refreshCheckout()} id='cartCheck' className={`flex mr-5 text-white bg-[#f47ed8] border-0 py-2 px-8 focus:outline-none hover:bg-pink-500 rounded text-lg  ${cart.length===0? "invisible" : ""}`}><BsBagCheckFill className='m-1'  />Checkout</button>}
+            <button  onClick={clearCart} className={`flex mr-5 text-white bg-[#f47ed8] border-0 py-2 px-8 focus:outline-none hover:bg-pink-500 rounded text-lg  ${cart.length===0? "invisible" : ""}`}><BsFillBagXFill className='m-1' />Clear</button>
           </div>
         </div>
       </div>

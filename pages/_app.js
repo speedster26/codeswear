@@ -10,7 +10,7 @@ import LoadingBar from 'react-top-loading-bar'
 
 function MyApp({ Component, pageProps }) {
   const [cart, setCart] = useState([])
-  const [buyNowCart, setBuyNowCart] = useState({})
+  const [buyNowCart, setBuyNowCart] = useState([])
   const [subTotal, setSubTotal] = useState(0)
   const [buyNowSubTot, setBuyNowSubTot] = useState(0)
   const [user, setUser] = useState({value:null})
@@ -138,6 +138,7 @@ function MyApp({ Component, pageProps }) {
   }
   const logout = () =>{
     localStorage.removeItem('token')
+    localStorage.removeItem('cart')
     toast.success('Logged out', {
       position: "bottom-center",
       autoClose: 1000,
@@ -149,18 +150,23 @@ function MyApp({ Component, pageProps }) {
     });
     setUser({value:null})
     setKey(Math.random())
+    setCart([])
+    setSubTotal(0)
     router.push('/')
   }
 
   const addToBuyNowCart = (itemCode, qty, price, name, size, variant, imgUrl, slug) => {
     let myBuyNowCart = buyNowCart
     let found = false;
-    if (myBuyNowCart.itemCode === itemCode) {
-      myBuyNowCart.qty = buyNowCart.qty + 1;
-      found = true
+    console.log(buyNowCart);
+    if(myBuyNowCart.length!==0){
+      if (myBuyNowCart[0].itemCode === itemCode) {
+        myBuyNowCart[0].qty = buyNowCart[0].qty + 1;
+        found = true
     }
+  }
     if (!found) {
-      myBuyNowCart = { itemCode, qty, price, name, size, variant, imgUrl, slug }
+      myBuyNowCart = [{ itemCode, qty, price, name, size, variant, imgUrl, slug }]
     }
     setBuyNowCart(myBuyNowCart)
     saveBuyNowCart(myBuyNowCart)
@@ -168,31 +174,30 @@ function MyApp({ Component, pageProps }) {
   const removeFromBuyNowCart = (itemCode) => {
     let myBuyNowCart = buyNowCart;
     let lessThanOne = false
-    if (myBuyNowCart.itemCode === itemCode) {
-      if (myBuyNowCart.qty <= 1) {
+    if (myBuyNowCart[0].itemCode === itemCode) {
+      if (myBuyNowCart[0].qty <= 1) {
         lessThanOne = true;
       }
       else {
-        myBuyNowCart.qty = buyNowCart.qty - 1;
+        myBuyNowCart[0].qty = buyNowCart[0].qty - 1;
       }
     }
     if (lessThanOne) {
-      myBuyNowCart = {}
+      myBuyNowCart = []
     }
-    // console.log(myCart);
     setBuyNowCart(myBuyNowCart)
     saveBuyNowCart(myBuyNowCart)
   }
   const saveBuyNowCart = (myBuyNowCart) => {
     let subT = 0
-    if (Object.keys(myBuyNowCart).length !== 0) {
-      subT = myBuyNowCart.price * myBuyNowCart.qty;
+    if (myBuyNowCart.length !== 0) {
+      subT = myBuyNowCart[0].price * myBuyNowCart[0].qty;
     }
     setBuyNowSubTot(subT)
   }
   const clearBuyNowCart = () => {
-    setBuyNowCart({})
-    saveBuyNowCart({})
+    setBuyNowCart([])
+    saveBuyNowCart([])
   }
   const buyNow = (itemCode, qty, price, name, size, variant, imgUrl, slug) => {
     addToBuyNowCart(itemCode, qty, price, name, size, variant, imgUrl, slug)

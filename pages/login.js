@@ -89,7 +89,7 @@ return (
             <Image width={100} height={60} className="w-10 object-contain object-center" src="/logo2.png"
               alt="Workflow" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Login to your account</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
             <Link href={'/signup'}><a className="font-medium text-pink-600 hover:text-pink-500">
@@ -130,19 +130,7 @@ return (
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                Remember me
-              </label>
-            </div>
-
+          <div className="flex items-center justify-end">
             <div className="text-sm">
               <Link href={'/forget'}><a className="font-medium text-pink-600 hover:text-pink-500">
                 Forgot your password?
@@ -158,7 +146,7 @@ return (
               <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                 <FaLock className="h-5 w-5 text-pink-500 group-hover:text-pink-400" aria-hidden="true" />
               </span>
-              Sign in
+              Login
             </button>
           </div>
         </form>

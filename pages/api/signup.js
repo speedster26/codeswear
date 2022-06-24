@@ -10,7 +10,7 @@ const handler = async (req, res) => {
             const {name,email,password} = req.body
             let al = await User.findOne({email})
             if(al===null){
-                let u = new User({name,email,password:CryptoJS.AES.encrypt(password, 'secret124').toString()});
+                let u = new User({name,email,password:CryptoJS.AES.encrypt(password, process.env.AES_SECRET).toString()});
                 u.save();
                 res.status(200).json({ success: true})
             }

@@ -1,14 +1,74 @@
 import { rejects } from 'assert';
-
+import NextCors from 'nextjs-cors';
 const https = require('https');
+import Order from "../../models/Order"
+import connectDb from "../../middleware/mongoose"
+import User from '../../models/User';
+import Products from '../../models/Products';
+var jwt = require('jsonwebtoken');
 /*
 * import checksum generation utility
 * You can get this utility from https://developer.paytm.com/docs/checksum/
 */
 const PaytmChecksum = require('paytmchecksum');
-export default async function handler(req, res) {
-
+const handler = async (req, res) => {
+    await NextCors(req, res, {
+        // Options
+        methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+        origin: '*',
+        optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+     });
     if (req.method === 'POST') {
+        // Checking if cart is tampered or not
+        let cart = req.body.cart;
+        let sumTotal = 0,product;
+        if(req.body.type === 'normal'){
+            for(let item of cart){
+                sumTotal+=item.price*item.qty
+                product = await Products.findById(item.itemCode)
+                if(product.availableQty < item.qty){
+                    res.status(200).json({success:false,error:"Sorry! Some items in your cart are out of stock."})
+                    return
+                }
+                if(product.price !== item.price){
+                    res.status(200).json({success:false,error:"There is some error in the cart. Please try again"})
+                    return
+                }
+            }
+            if(sumTotal!==req.body.total){
+                res.status(200).json({success:false,error:"There is some error in the cart. Please try again"})
+                return
+            }
+        }
+        else if(req.body.type === 'buynow'){
+            sumTotal+=cart[0].price*cart[0].qty
+            product = await Products.findById(cart[0].itemCode)
+            if(product.price !== cart[0].price){
+                res.status(200).json({success:false,error:"There is some error in the cart. Please try again"})
+                return
+            }
+            if(sumTotal!==req.body.total){
+                res.status(200).json({success:false,error:"There is some error in the cart. Please try again"})
+                return
+            }
+        }
+
+        // Save order
+        var t = jwt.verify(req.body.token,process.env.JWT_SECRET)
+        let user = await User.findOne({email:t.email})
+        let order = new Order({
+            userId: user._id,
+            orderId: req.body.oid,
+            orderInfo: {
+                name: req.body.name,
+                email: req.body.email,
+                phone: req.body.phone,
+                address: req.body.address,
+                products: req.body.cart,
+                amount: req.body.total,
+            }
+        })
+        await order.save();
 
         var paytmParams = {};
 
@@ -19,11 +79,11 @@ export default async function handler(req, res) {
             "orderId": req.body.oid,
             "callbackUrl": `${process.env.NEXT_PUBLIC_HOST}/api/posttransaction`,
             "txnAmount": {
-                "value": req.body.subTotal,
+                "value": req.body.total,
                 "currency": "INR",
             },
             "userInfo": {
-                "custId": req.body.email,
+                "custId": user._id,
             },
         };
 
@@ -41,6 +101,8 @@ export default async function handler(req, res) {
 
             const requestAsync = async ()=>{
                 return new Promise((resolve, reject)=>{
+                    try {
+                        
                     var options = {
 
                         /* for Staging */
@@ -65,17 +127,24 @@ export default async function handler(req, res) {
                         });
         
                         post_res.on('end', function () {
-                            console.log('Response: ', response);
-                            resolve(JSON.parse(response).body)
+                            // console.log('Response: ', response);
+                            let ress = JSON.parse(response).body
+                            ress.success = true
+                            resolve(ress)
                         });
                     });
         
                     post_req.write(post_data);
                     post_req.end();
+                } catch (error) {
+                    console.log(error);
+                }
                 })
             }
             let myr = await requestAsync();
             res.status(200).json(myr)
+            
 
     }
 }
+export default connectDb(handler)

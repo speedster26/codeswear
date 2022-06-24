@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState , useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import mongoose from 'mongoose'
@@ -10,20 +10,24 @@ const Slug = (props) => {
   const { cart, addToCart, removeFromCart, clearCart, subTotal, product, variants, colorSizeSlug, addToBuyNowCart, buyNow } = props
   const [size, setSize] = useState(product.size)
   const [colour, setColour] = useState(product.colour)
-  // console.log(addToBuyNowCart);
-  const availS = () => {
-
-  }
+  
   const router = useRouter();
   const { slug } = router.query;
   const [pin, setPin] = useState()
   const [service, setService] = useState(null)
+  useEffect(() => {
+    setColour(product.colour)
+    setSize(product.size)
+  }, [product.colour, product.size])
+  
   const checkServiceability = async () => {
     let pins = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/pincode`)
     let pinJson = await pins.json();
-    if (pinJson.includes(parseInt(pin))) {
-      setService(true)
-      toast.success('This pincode is serviceable', {
+    if(pin.length===6){
+
+      if (pinJson.includes(parseInt(pin))) {
+        setService(true)
+        toast.success('This pincode is serviceable', {
           position: "bottom-center",
           autoClose: 1000,
           hideProgressBar: false,
@@ -36,14 +40,26 @@ const Slug = (props) => {
     else {
       setService(false)
       toast.error('This pincode is not serviceable', {
-          position: "bottom-center",
-          autoClose: 1000,
+        position: "bottom-center",
+        autoClose: 1000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          });
+        });
+      }
+    }
+    else{
+      toast.warn('This pincode is not valid', {
+        position: "bottom-center",
+        autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
     }
   }
   const onChangePin = (e) => {
@@ -52,11 +68,13 @@ const Slug = (props) => {
   const refreshVariants = (newSize, newColour) => {
     if (newSize === size) {
       let url = `${process.env.NEXT_PUBLIC_HOST}/product/${Object.values(colorSizeSlug[newColour])[0]['slug']}`
-      window.location = url;
+      // window.location = url;
+      router.push(url)
     }
     else {
       let url = `${process.env.NEXT_PUBLIC_HOST}/product/${colorSizeSlug[newColour][newSize]['slug']}`
-      window.location = url;
+      router.push(url)
+      // window.location = url;
     }
 
   }
@@ -128,7 +146,7 @@ const Slug = (props) => {
                   <span className="mr-3">Size</span>
                   <div className="relative">
                     <select value={size} onChange={(e) => refreshVariants(e.target.value, colour)} className="rounded border appearance-none border-gray-300 py-2 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-500 text-base pl-3 pr-10">
-                      {Object.keys(colorSizeSlug).map((col) => { if (col === colour) { return Object.keys(colorSizeSlug[col]).map((s) => { return <option key={s}>{s}</option> }) } })}
+                      {Object.keys(colorSizeSlug).map((col) => { if (col === colour) { return Object.keys(colorSizeSlug[col]).map((s) => { return <option value={s} key={s}>{s}</option> }) } })}
                       {/* <option>S</option>
                       <option>M</option>
                       <option>L</option>
@@ -142,18 +160,14 @@ const Slug = (props) => {
                   </div>
                 </div>
               </div>
-              <div className="flex">
-                <span className="title-font font-medium text-2xl text-gray-900">&#8377;	{product.price}</span>
-                <button onClick={() => buyNow(product._id, 1, product.price, product.title, product.size, product.colour, product.img, product.slug)} className="flex ml-10 text-white bg-[#f47ed8] border-0 py-2 px-6 focus:outline-none hover:bg-pink-500 rounded">Buy Now</button>
-                <button onClick={() => { addToCart(product._id, 1, product.price, product.title, product.size, product.colour, product.img, product.slug) }} className="flex ml-5 text-white bg-[#f47ed8] border-0 py-2 px-6 focus:outline-none hover:bg-pink-500 rounded">Add to Cart</button>
-                <button className="rounded-full w-10 h-10 bg-gray-200 p-0 border-0 inline-flex items-center justify-center text-gray-500 ml-4">
-                  <svg fill="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">
-                    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
-                  </svg>
-                </button>
+              <div className="flex justify-between md:justify-start md:space-x-10">
+                <span className="font-medium text-xl text-gray-900 w-28">&#8377;	{product.price}</span>
+                <button onClick={() => buyNow(product._id, 1, product.price, product.title, product.size, product.colour, product.img, product.slug)} className="flex text-white bg-[#f47ed8] border-0 py-2 px-6 focus:outline-none hover:bg-pink-500 rounded">Buy Now</button>
+                <button onClick={() => { addToCart(product._id, 1, product.price, product.title, product.size, product.colour, product.img, product.slug) }} className="flex text-white bg-[#f47ed8] border-0 py-2 px-6 focus:outline-none hover:bg-pink-500 rounded">Add to Cart</button>
+                
               </div>
               <div className="flex pin my-5 ">
-                <input onChange={onChangePin} type="text" maxLength="6" placeholder='Enter Pincode' className='border-pink-500 border-2 w-48' />
+                <input onChange={onChangePin} type="text" minLength={6} maxLength="6" placeholder='Enter Pincode' className='border-pink-500 border-2 w-48' />
                 <button onClick={checkServiceability} className="flex ml-10 text-white bg-[#f47ed8] border-0 py-2 px-6 focus:outline-none hover:bg-pink-500 rounded">Check</button>
               </div>
               {/* {(!service && service != null) && <div className="text-red-700 text-sm mt-3">
@@ -171,10 +185,10 @@ const Slug = (props) => {
 }
 export async function getServerSideProps(context) {
   if (!mongoose.connections[0].readyState) {
-    await mongoose.connect(process.env.MONGO_URI)
+    mongoose.connect(process.env.MONGO_URI)
   }
-  let product = await Products.findOne({ slug: context.query.slug })
-  let variants = await Products.find({ title: product.title , category: product.category })
+  let product = await Products.findOne({ slug: context.query.slug})
+  let variants = await Products.find({ title: product.title , category: product.category , availableQty : {$gt:0} })
   let colorSizeSlug = {} // {red: {XL: {slug: 'wear-the-code-xl-red'}}}
   for (let item of variants) {
     if (Object.keys(colorSizeSlug).includes(item.colour)) {
