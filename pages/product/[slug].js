@@ -140,7 +140,7 @@ const Slug = (props) => {
               <div className="flex mt-6 items-center pb-5 border-b-2 border-gray-100 mb-5">
                 <div className="flex">
                   <span className="mr-3">Color</span>
-                  {Object.keys(colorSizeSlug).map((col) => { return <button onClick={(e) => refreshVariants(size, e.target.value)} key={col} value={col} className={`border-2 ${colour === col ? `border-gray-600` : null} border-gray-300 bg-${col}-500 ${(col === 'black' || col === 'white') ? `bg-${col}` : ``} rounded-full w-6 h-6 focus:outline-none`}></button> })}
+                  {Object.keys(colorSizeSlug).map((col) => { return <button onMouseOver={(e) => refreshVariants(size, e.target.value)} key={col} value={col} className={`border-2 ${colour === col ? `border-gray-600` : null} border-gray-300 bg-${col}-500 ${(col === 'black' || col === 'white') ? `bg-${col}` : ``} rounded-full w-6 h-6 focus:outline-none`}></button> })}
                 </div>
                 <div className="flex ml-6 items-center">
                   <span className="mr-3">Size</span>
@@ -199,7 +199,6 @@ export async function getServerSideProps(context) {
       colorSizeSlug[item.colour][item.size] = { slug: item.slug }
     }
   }
-  // console.log(colorSizeSlug);
   return {
     props: { product: JSON.parse(JSON.stringify(product)), variants: JSON.parse(JSON.stringify(variants)), colorSizeSlug }, // will be passed to the page component as props
   }

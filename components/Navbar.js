@@ -122,7 +122,7 @@ const Navbar = (props) => {
           <div className="flex flex-row mx-auto items-center justify-center border-t-[1px] border-pink-300">
             {!user.value && <Link href={'/login'}><a className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">Login</a></Link>}
             {!user.value && <Link href={'/signup'}><a className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">Signup</a></Link>}
-            {user.value && <button onClick={()=>{router.push('/myaccount',`/myaccount/123456789`)}} className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">My Account</button>}
+            {user.value && <button onClick={()=>{router.push('/myaccount')}} className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">My Account</button>}
             {user.value && <button onClick={()=>{router.push(`/orders?id=${user.value}`,`/orders`)}} className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">My Orders</button>}
             {user.value && <button onClick={logout} className="flex text-white font-medium bg-[#f47ed8] border-0 py-1 px-3 my-2 focus:outline-none hover:bg-pink-500 rounded">Logout</button>}
           </div>
@@ -136,9 +136,9 @@ const Navbar = (props) => {
           {Object.keys(cart).length === 0 && <div className='my-2 '>Cart is Empty!</div>}
           {cart && Object.keys(cart).map((index) => {
             return <li key={cart[index].itemCode}>
-              <Link href={`${process.env.NEXT_PUBLIC_HOST}/product/${cart[index].slug}`}><div className='item flex my-3 mx-0'>
-                <div className='mr-3'><Image alt="ecommerce" width={120} height={120} className="lg:w-1/2 -z-10 w-full lg:h-auto h-64 object-contain object-center rounded" src={cart[index].imgUrl} /></div>
-                <div className="flex flex-col font-normal w-2/5">
+              <Link href={`${process.env.NEXT_PUBLIC_HOST}/product/${cart[index].slug}`}><div className='item flex my-3 mx-0 '>
+                <div className='mr-3 cursor-pointer'><Image alt="ecommerce" width={120} height={120} className="lg:w-1/2 -z-10 w-full lg:h-auto h-64 object-contain object-center rounded" src={cart[index].imgUrl} /></div>
+                <div className="flex flex-col font-normal w-2/5 cursor-pointer">
 
                   <div className='h-12 overflow-hidden'>{cart[index].name}</div>
                   <div>₹{cart[index].price}</div>

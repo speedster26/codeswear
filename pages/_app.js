@@ -29,11 +29,17 @@ function MyApp({ Component, pageProps }) {
       if(token){
         setUser({value:token})
       }
+      else{
+        setUser({value:null})
+      }
       setKey(Math.random())
       if (localStorage.getItem("cart")) {
         let cartV = JSON.parse(localStorage.getItem("cart"))
         setCart(cartV)
         saveCart(cartV)
+      }
+      else{
+        setCart([])
       }
     } catch (error) {
       console.error(error);
@@ -113,7 +119,7 @@ function MyApp({ Component, pageProps }) {
     if (cart.length != 0) {
       setCart([])
       setSubTotal(0)
-      localStorage.clear()
+      localStorage.removeItem('cart')
       toast.success('Cart cleared', {
         position: "bottom-center",
         autoClose: 1000,
@@ -229,7 +235,7 @@ function MyApp({ Component, pageProps }) {
         waitingTime={300}
     />
    {key && <Navbar key={key} logout={logout} user={user} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} clearCart={clearCart} subTotal={subTotal} buyNowCart={buyNowCart} setBuyNowCart={setBuyNowCart} clearBuyNowCart={clearBuyNowCart} />}
-    <Component cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} clearCart={clearCart} subTotal={subTotal} buyNowCart={buyNowCart} addToBuyNowCart={addToBuyNowCart} buyNowSubTot={buyNowSubTot} removeFromBuyNowCart={removeFromBuyNowCart} buyNow={buyNow} clearBuyNowCart={clearBuyNowCart} {...pageProps} />
+    <Component cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} clearCart={clearCart} subTotal={subTotal} buyNowCart={buyNowCart} addToBuyNowCart={addToBuyNowCart} buyNowSubTot={buyNowSubTot} removeFromBuyNowCart={removeFromBuyNowCart} buyNow={buyNow} clearBuyNowCart={clearBuyNowCart} logout={logout} {...pageProps} />
     <Footer cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} clearCart={clearCart} subTotal={subTotal} />
   </>
 }

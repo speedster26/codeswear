@@ -1,4 +1,4 @@
-import React , { useState } from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Products from '../models/Products'
@@ -13,7 +13,7 @@ const Tshirt = (props) => {
       <section className="text-gray-600 body-font">
         <div className="container px-5 py-24 md:px-2 mx-auto ">
           <div className="flex flex-wrap ">
-            {Object.keys(products).length===0 && <p>Currently all the Tshirts are out of stock. Please stay tuned to get further updates!</p>}
+            {Object.keys(products).length === 0 && <p>Currently all the Tshirts are out of stock. Please stay tuned to get further updates!</p>}
             {Object.keys(products).map((item) => {
               return <Link key={products[item]._id} href={`/product/${products[item].slug}`}>
                 <div className="lg:w-1/4 md:w-1/2 p-4 w-full shadow-md border-1 hover:shadow-[#f47ed8] hover:cursor-pointer">
@@ -61,8 +61,9 @@ export async function getServerSideProps(context) {
   if (!mongoose.connections[0].readyState) {
     mongoose.connect(process.env.MONGO_URI)
   }
-  let products = await Products.find({ category: "T-Shirt" })
+  let products = await Products.find({ category: "T-Shirt", availableQty: { $gt: 0 } })
   let tshirts = {}
+  let tshirts2 = {}
   for (let item of products) {
     if (item.title in tshirts) {
       if (!tshirts[item.title].colour.includes(item.colour) && item.availableQty > 0) {
@@ -74,10 +75,8 @@ export async function getServerSideProps(context) {
     }
     else {
       tshirts[item.title] = JSON.parse(JSON.stringify(item))
-      if (item.availableQty > 0) {
-        tshirts[item.title].colour = [item.colour]
-        tshirts[item.title].size = [item.size]
-      }
+      tshirts[item.title].colour = [item.colour]
+      tshirts[item.title].size = [item.size]
     }
   }
   return {

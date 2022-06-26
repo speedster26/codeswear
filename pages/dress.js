@@ -1,4 +1,4 @@
-import React , { useState } from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Products from '../models/Products'
@@ -13,7 +13,7 @@ const Dress = (props) => {
       <section className="text-gray-600 body-font">
         <div className="container px-5 py-24 md:px-2 mx-auto ">
           <div className="flex flex-wrap ">
-            {Object.keys(products).length===0 && <p className='mx-auto'>Currently all the dresses are out of stock. Please stay tuned to get further updates!</p>}
+            {Object.keys(products).length === 0 && <p className='mx-auto'>Currently all the dresses are out of stock. Please stay tuned to get further updates!</p>}
             {Object.keys(products).map((item) => {
               return <Link key={products[item]._id} href={`/product/${products[item].slug}`}>
                 <div className="lg:w-1/4 md:w-1/2 p-4 w-full shadow-md border-1 hover:shadow-[#f47ed8] hover:cursor-pointer">
@@ -59,7 +59,7 @@ const Dress = (props) => {
 }
 export async function getServerSideProps(context) {
   if (!mongoose.connections[0].readyState) {
-    await mongoose.connect(process.env.MONGO_URI)
+    mongoose.connect(process.env.MONGO_URI)
   }
   let products = await Products.find({ category: "Dress" })
   let dresses = {}
@@ -74,10 +74,8 @@ export async function getServerSideProps(context) {
     }
     else {
       dresses[item.title] = JSON.parse(JSON.stringify(item))
-      if (item.availableQty > 0) {
-        dresses[item.title].colour = [item.colour]
-        dresses[item.title].size = [item.size]
-      }
+      dresses[item.title].colour = [item.colour]
+      dresses[item.title].size = [item.size]
     }
   }
   return {

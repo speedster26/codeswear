@@ -59,6 +59,9 @@ const Signup = () => {
         setEmail('')
         setPassword('')
         setCpassword('')
+        setTimeout(() => {
+          router.push(`/login`)
+        }, 2000);
       }
       else{
         toast.warn(response.error, {

@@ -120,6 +120,9 @@ const Checkout = (props) => {
                   body: JSON.stringify(oid),
                 })
               }
+              else{
+                localStorage.removeItem('cart')
+              }
             }
           }
         };
@@ -205,6 +208,9 @@ const Checkout = (props) => {
                   },
                   body: JSON.stringify(oid),
                 })
+              }
+              else{
+                localStorage.removeItem('cart')
               }
             }
           }

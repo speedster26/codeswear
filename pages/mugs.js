@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import Products from '../models/Products'
+import mongoose from 'mongoose'
 
 const Mugs = () => {
   return (
@@ -135,5 +137,35 @@ const Mugs = () => {
     </div>
   )
 }
+
+export async function getServerSideProps(context) {
+  if (!mongoose.connections[0].readyState) {
+    mongoose.connect(process.env.MONGO_URI)
+  }
+  let products = await Products.find({ category: "T-Shirt" ,  availableQty : {$gt:0}})
+  let tshirts = {}
+  for (let item of products) {
+    
+    if (item.title in tshirts) {
+      if (!tshirts[item.title].colour.includes(item.colour) && item.availableQty > 0) {
+        tshirts[item.title].colour.push(item.colour)
+      }
+      if (!tshirts[item.title].size.includes(item.size) && item.availableQty > 0) {
+        tshirts[item.title].size.push(item.size)
+      }
+    }
+    else {
+      tshirts[item.title] = JSON.parse(JSON.stringify(item))
+      if (item.availableQty > 0) {
+        tshirts[item.title].colour = [item.colour]
+        tshirts[item.title].size = [item.size]
+      }
+    }
+  }
+  return {
+    props: { products: JSON.parse(JSON.stringify(tshirts)) }, // will be passed to the page component as props
+  }
+}
+
 
 export default Mugs
